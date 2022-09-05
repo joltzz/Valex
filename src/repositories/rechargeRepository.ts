@@ -1,4 +1,4 @@
-import { connection } from "../../db.js";
+import { connection } from "../db";
 
 export interface Recharge {
   id: number;
@@ -15,6 +15,19 @@ export async function findByCardId(cardId: number) {
   );
 
   return result.rows;
+}
+
+export async function getTotalRecharges(cardId: number) {
+  const result = await connection.query(
+    `SELECT SUM(amount) as "totalRecharges" FROM recharges WHERE "cardId" = $1 GROUP BY "cardId"`,
+    [cardId]
+    );
+  
+    if (result.rows[0]) {
+      return result.rows[0]
+    }
+    
+    return { totalRecharges: 0 };
 }
 
 export async function insert(rechargeData: RechargeInsertData) {

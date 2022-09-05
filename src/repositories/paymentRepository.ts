@@ -1,4 +1,4 @@
-import { connection } from "../../db.js";
+import { connection } from "../db";
 
 export interface Payment {
   id: number;
@@ -23,6 +23,19 @@ export async function findByCardId(cardId: number) {
   );
 
   return result.rows;
+}
+
+export async function getTotalPayments(cardId: number) {
+  const result = await connection.query(
+    `SELECT SUM(amount) as "totalPayments" FROM payments WHERE "cardId" = $1 GROUP BY "cardId"`,
+    [cardId]
+  );
+
+  if (result.rows[0]) {
+    return result.rows[0]
+  }
+  
+  return { totalPayments: 0 };
 }
 
 export async function insert(paymentData: PaymentInsertData) {
